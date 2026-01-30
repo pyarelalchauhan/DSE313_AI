@@ -47,6 +47,7 @@ Agents are that Plans
 
 ## 1.4 Informed Search
 Search strategy that uses the knowledge specific to the problem to find the better solution.
+Coding refrences : [cs188](https://github.com/mgiannopoulos24/Artificial-Intelligence/tree/main/Spring%202025/Project%201/search)
 
 **Refrences**
 1. Notes from [CS188](https://inst.eecs.berkeley.edu/~cs188/textbook/search/)
