@@ -13,3 +13,8 @@ This repo is created for the coarse DSE313 (Artificial Intelligence) - 2026 (Jan
 **2. Book Refrences**
 1. [Artificial Intelligence: A Modern Approach, 4th US ed.](https://aima.cs.berkeley.edu/)
    - https://people.engr.tamu.edu/guni/csce625/slides/AI.pdf
+
+**3. Setup**
+```bash
+./setup.sh
+```

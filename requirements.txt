@@ -1,0 +1,6 @@
+jupyterlab==4.4.7
+ipykernel
+ipython
+pillow
+matplotlib
+numpy
