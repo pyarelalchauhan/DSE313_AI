@@ -225,6 +225,65 @@ Since **11 ≤ 19**, Manhattan distance is admissible here!
 - The actual path can only be **equal to or longer** (due to walls)
 - It can never be shorter than Manhattan distance
 
+#### Examples of Admissible vs Non-Admissible Heuristics for Mazes
+
+| Heuristic | Formula | Admissible? | Why? |
+|-----------|---------|-------------|------|
+| **Manhattan Distance** | \|Δrow\| + \|Δcol\| | ✅ Yes | Shortest possible grid path (ignoring walls) |
+| **Euclidean Distance** | √(Δrow² + Δcol²) | ✅ Yes | Straight-line distance ≤ any grid path |
+| **Zero Heuristic** | h(n) = 0 | ✅ Yes | Never overestimates (but uninformative) |
+| **Chebyshev Distance** | max(\|Δrow\|, \|Δcol\|) | ✅ Yes | Assumes diagonal moves allowed |
+| **2 × Manhattan** | 2 × (\|Δrow\| + \|Δcol\|) | ❌ No | Overestimates by 2x |
+| **Manhattan + 5** | \|Δrow\| + \|Δcol\| + 5 | ❌ No | Always overestimates by 5 |
+
+#### Detailed Examples from Maze4
+
+**Position (4, 4) to Goal (0, 11):**
+
+| Heuristic | Calculation | Value | Actual Cost | Admissible? |
+|-----------|-------------|-------|-------------|-------------|
+| Manhattan | \|4-0\| + \|4-11\| | 11 | 19 | ✅ 11 ≤ 19 |
+| Euclidean | √(16 + 49) | 8.06 | 19 | ✅ 8.06 ≤ 19 |
+| 2 × Manhattan | 2 × 11 | 22 | 19 | ❌ 22 > 19 |
+| Manhattan + 10 | 11 + 10 | 21 | 19 | ❌ 21 > 19 |
+
+#### Why Non-Admissible Heuristics Break A*
+
+```
+Example: Using h(n) = 2 × Manhattan Distance
+
+Start A at (6, 0), Goal B at (0, 11)
+
+Optimal path through node X:
+  - Actual g(X) = 10, Actual remaining = 9
+  - Real total cost = 19
+
+With admissible h:
+  - f(X) = 10 + 9 = 19 ✓ Correctly evaluated
+
+With non-admissible h (2 × Manhattan):
+  - h(X) = 2 × 9 = 18 (overestimate!)
+  - f(X) = 10 + 18 = 28 ✗ Looks too expensive!
+
+A* might skip node X and choose a worse path that
+appears cheaper due to the overestimated heuristic.
+```
+
+#### Visual: Admissible vs Non-Admissible
+
+```
+Position (3, 3) to Goal (0, 11):
+
+Actual shortest path (around walls) = 15 steps
+
+                    Estimate    Actual    Admissible?
+Manhattan:             11         15        ✅ (11 ≤ 15)
+Euclidean:            8.5         15        ✅ (8.5 ≤ 15)
+2 × Manhattan:         22         15        ❌ (22 > 15) OVERESTIMATES!
+```
+
+**Key Insight:** An admissible heuristic can **underestimate** (be optimistic) but must **never overestimate**. Underestimating just means A* explores more nodes, but still finds the optimal path. Overestimating can cause A* to miss the optimal path entirely!
+
 ---
 
 ### Consistent Heuristics (Triangle Inequality)
