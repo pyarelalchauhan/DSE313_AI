@@ -12,7 +12,15 @@ In AI, we often need to find the best configuration, arrangement, or solution am
 
 ## What is Local Search?
 
+In the previous note, we wanted to find the goal state, along with the optimal path to get there. But in some problems, we only care about finding the goal state — reconstructing the path can be trivial. For example, in Sudoku, the optimal configuration is the goal. Once you know it, you know how to get there by filling in the squares one by one.
+
+Local search algorithms allow us to find goal states without worrying about the path to get there. In local search problems, the state space consists of sets of "complete" solutions. We use these algorithms to try to find a configuration that satisfies some constraints or optimizes some objective function.
+
+The basic idea of local search algorithms is that from each state, they locally move towards states that have a higher objective value until a maximum (hopefully the global one) is reached.
+
 **Local Search** = search algorithms that maintain a **single node** (current state) and search by **moving to a neighboring node**.
+
+![Figure 4.1: A one-dimensional state-space landscape in which elevation corresponds to the objective function. The aim is to find the global maximum. Hill-climbing search modifies the current state to try to improve it, as shown by the arrow.](1.png)
 
 | Feature | Classical Search (BFS/DFS/A*) | Local Search (Hill Climbing) |
 |---------|-------------------------------|------------------------------|
@@ -43,12 +51,23 @@ Imagine a landscape where:
 | **Global minimum** | The single lowest point across all states |
 | **Local maximum** | Higher than all neighbors, but not the global max |
 | **Local minimum** | Lower than all neighbors, but not the global min |
+| **Plateau / Shoulder** | Flat area where no direction leads to immediate improvement |
 
 ---
 
-## Hill Climbing Algorithm
+## Hill-Climbing Search
+
+The hill-climbing search algorithm (or **steepest-ascent**) moves from the current state towards the neighboring state that increases the objective value the most. The algorithm does not maintain a search tree but only tracks the states and the corresponding values of the objective. The "greediness" of hill-climbing makes it vulnerable to being trapped in **local maxima** (see figure 4.1), as locally those points appear as global maxima to the algorithm, and **plateaus** (see figure 4.1). Plateaus can be categorized into "flat" areas at which no direction leads to improvement ("**flat local maxima**") or flat areas from which progress can be slow ("**shoulders**").
+
+Variants of hill-climbing, like **stochastic hill-climbing** (which selects an action randomly among the possible uphill moves), have been proposed. Stochastic hill-climbing has been shown in practice to converge to higher maxima at the cost of more iterations. Another variant, **random sideways moves**, allows moves that don't strictly increase the objective, helping the algorithm escape "shoulders."
+
+The pseudocode of hill-climbing can be seen below. As the name suggests, the algorithm iteratively moves to a state with a higher objective value until no such progress is possible. Hill-climbing is **incomplete**. **Random-restart hill-climbing**, on the other hand, conducts a number of hill-climbing searches from randomly chosen initial states, making it trivially complete as, at some point, a randomly chosen initial state may converge to the global maximum.
+
+As a note, later in this course, you will encounter the term "**gradient descent**." It is the exact same idea as hill-climbing, except instead of maximizing an objective function, we will want to minimize a cost function.
 
 ### Pseudocode
+
+![Hill-Climbing Pseudocode](2.png)
 
 ```
 function HILL-CLIMB(problem):
@@ -75,35 +94,15 @@ function HILL-CLIMB(problem):
 | **Steepest-ascent** | Pick the **single best** neighbor |
 | **Stochastic** | Pick **randomly** among better neighbors |
 | **First-choice** | Pick the **first** neighbor that is better |
+| **Random sideways** | Allow moves that don't strictly improve (escape shoulders) |
 | **Random Restart** | Run hill climbing **multiple times**, keep the best result |
 | **Simulated Annealing** | Sometimes accept **worse** neighbors (with decreasing probability) |
 
----
+### The Problem: Local Minima
 
-## The Problem: Local Minima
+Hill Climbing is **greedy** — it always moves to the best neighbor. This means it can get **stuck** at local minima (see Figure 4.1 above). The algorithm stops because all neighbors are worse, even though the **global minimum** exists elsewhere.
 
-Hill Climbing is **greedy** — it always moves to the best neighbor. This means it can get **stuck** at local minima:
-
-```
-Cost
-  ^
-  |  *
-  | * *         *
-  |*   *       * *
-  |     *     *   *
-  |      *   *     *
-  |       * *       * *
-  |        X         * * *
-  |     Local          X
-  |     Minimum     GLOBAL
-  |                 MINIMUM
-  +-------------------------------->
-                          States
-```
-
-The algorithm stops at the **local minimum** (X on left) because all neighbors are worse, even though the **global minimum** (X on right) exists elsewhere.
-
-### Solution: Random Restart
+**Solution:** Random Restart Hill Climbing — run hill climbing many times from different random starting points, and keep the best result.
 
 ```
 function RANDOM-RESTART(problem, max_restarts):
@@ -114,8 +113,6 @@ function RANDOM-RESTART(problem, max_restarts):
             best = result
     return best
 ```
-
-By trying many different random starting points, we increase the chance of finding the global minimum.
 
 ---
 
@@ -258,6 +255,8 @@ Hill_Climbing/
 ├── README.md                          ← This file
 ├── DSE313_AI_Hill_climbing.ipynb      ← Step-by-step tutorial notebook
 ├── lecture3.pdf                        ← CS50 AI Lecture 3 slides
+├── 1.png                              ← State-space landscape (Figure 4.1)
+├── 2.png                              ← Hill-Climbing pseudocode image
 ├── hospitals/                         ← Working copy of the code
 │   ├── hospitals.py                   ← Main hill climbing implementation
 │   └── assets/
@@ -284,3 +283,4 @@ Hill_Climbing/
 | **Cost Function** | Sum of Manhattan distances from houses to nearest hospital |
 | **Local Minimum** | Better than all neighbors, but not globally optimal |
 | **Random Restart** | Run hill climbing many times to escape local minima |
+| **Gradient Descent** | Same idea as hill climbing, but minimizing a cost function |
